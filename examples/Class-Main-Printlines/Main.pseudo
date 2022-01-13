@@ -1,0 +1,12 @@
+// My First Program
+// Author: John von Neumann
+// Copied from ccse.kennesaw.edu/fye/pseudocode/pseudocodeguide.php Under Introduction
+// Modified by Cory Borek
+CLASS Main
+BEGIN
+    MAIN
+	   PRINTLINE "Hello, World!"
+       PRINT "FYE " + " is not " // double check comments
+       PRINT "so bad!"
+    END MAIN
+END CLASS
