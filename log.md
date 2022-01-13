@@ -6,5 +6,6 @@
  - Created a basic file IO system
  - Started conversion of classes, comments
  - Conversion of file indents.
+ - Commented code for future use.
 
 Time Spent: 1 1/2 Hours
