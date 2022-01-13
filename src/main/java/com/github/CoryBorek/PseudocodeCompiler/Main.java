@@ -15,12 +15,14 @@ public class Main {
      * @param args program arguments from command line.
      */
     public static void main(String[] args) {
-
+        //Welcome user to the program
         System.out.println("Welcome to the Pseudocode Compiler...");
         System.out.println("Created by Cory Borek");
 
+        //Get path of file from command line.
         Path main = Paths.get("./").resolve(args[0]);
 
+        //Compile the file.
         ClassCompiler compiler = new ClassCompiler(main.toFile());
         compiler.run();
 
