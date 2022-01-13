@@ -5,8 +5,8 @@
 CLASS Main
 BEGIN
     MAIN
-	   PRINTLINE "Hello, World!"
-       PRINT "FYE " + " is not " // double check comments
-       PRINT "so bad!"
+        PRINTLINE "Hello, World!"
+        PRINT "FYE " + " is not "
+        PRINT "so bad!"
     END MAIN
 END CLASS
