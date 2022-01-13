@@ -122,10 +122,20 @@ public class ClassCompiler {
         else if (previousLine.startsWith("CLASS") && in.startsWith("BEGIN")) {
             return " {\n";
         }
-        //End of class.
-        else if (in.startsWith("END CLASS")) {
+        //End of something.
+        else if (in.startsWith("END")) {
             return indent + "}\n";
         }
+        else if (in.startsWith("MAIN")) {
+            return indent + "public static void main(String[] args) {\n";
+        }
+        else if (in.startsWith("PRINTLINE")) {
+            return indent + "System.out.println(" + in.replace("PRINTLINE ", "") + ");\n";
+        }
+        else if (in.startsWith("PRINT")) {
+            return indent + "System.out.print(" + in.replace("PRINT ", "") + ");\n";
+        }
+
 
         return "\n";
     }
