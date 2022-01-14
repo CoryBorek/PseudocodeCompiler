@@ -21,5 +21,6 @@ Time Spent: 30 Minutes
  - Added Variables
  - Wrote another test class
  - Fixed bugs with variables
+ - Bumped version number to `0.0.3-alpha`
 
 Time Spent: 3 Hours
