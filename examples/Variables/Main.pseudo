@@ -1,0 +1,38 @@
+// Pseudocode Example
+// By Cory Borek
+CLASS Main
+BEGIN
+
+    //Main function for the program.
+    MAIN
+        //Output what this program is.
+        PRINTLINE "Pseudocode Variable Test."
+
+        //Variables
+        CREATE var1 = 1
+        CREATE var2 = 1.1
+        CREATE var3
+        var3 = 'c'
+        CREATE var4 = "This is a test"
+        CREATE var5 = var4 + var1
+        CREATE var6 = false
+        CREATE var7 = 1 + 3
+
+        //Outputs
+        PRINTLINE "Var1" + var1
+        PRINTLINE "" + var2 + var3
+        PRINTLINE var5
+        PRINTLINE var7
+        PRINTLINE var6
+    END MAIN
+
+END CLASS
+
+
+// Program Expected output:
+// Pseudocode Variable Test.
+// Var11
+// 1.1c
+// This is a test1
+// 4
+// false

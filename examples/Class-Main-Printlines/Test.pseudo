@@ -1,0 +1,12 @@
+// Pseudocode Compiler Test Class
+// By Cory Borek
+
+CLASS Test
+BEGIN
+
+    MAIN
+        PRINTLINE "Test"
+        PRINTLINE "Test 2"
+        PRINTLINE "Test 3"
+    END MAIN
+END CLASS
