@@ -82,7 +82,7 @@ public class ClassCompiler {
                 String temp = updateLine(comments[0], indent);
                 out += temp;
                 if(!temp.replaceAll("\t| |\n", "").equals("")) {
-                    System.out.println(comments[0] + " -> " + temp.replace(indent, ""));
+                    System.out.println(indent + comments[0] + " -> " + temp.replace(indent, ""));
                     previousLine = comments[0];
                 }
             }
@@ -181,7 +181,7 @@ public class ClassCompiler {
         }
         //End of something.
         else if (in.startsWith("END")) {
-            currentMethod = "MAIN";
+            if (in.replace("END ", "").contains(currentMethod)) currentMethod = "MAIN";
             return indent + "}\n";
         }
         //Main function
@@ -324,94 +324,142 @@ public class ClassCompiler {
             }
         }
         else if (in.contains("=")) {
+            //Variable Instantiation, add variable.
             if (vars.containsKey(in.substring(0, in.indexOf("=")).replace(" ", ""))) {
                 String[] split = in.split("=");
                 updateVariables(split);
                 return indent + in + ";\n";
             }
         }
+        //Methods
         else if (in.startsWith("METHOD")) {
+            //Parameters
             if (in.contains("(parameters:")) {
+                // Get indexes
                 int index = in.indexOf("(parameters:");
                 int index2 = in.indexOf(")");
+
+                //Get parameters as array
                 String params = in.substring(index + "(parameters:".length(), index2).replace(" ", "");
                 String[] paramArr = params.split(",");
+
+                //Map for output
                 Map<String,String[]> paramMap = new HashMap<>();
 
+                //Output for parameters
                 String paramOut = "";
+
+                //Get output for parameters
                 for (int i = 0; i < paramArr.length; i++) {
                     String[] param2 = {"var", paramArr[i]};
                     paramMap.put(String.valueOf(i),param2);
                     paramOut += "var " + paramArr[i] + ",";
                 }
+                //Remove extra comma
                 if (paramOut.length() > 0) paramOut = paramOut.substring(0, paramOut.length() - 1);
+                //Return type
                 paramMap.put("-1", new String[]{"void", "return"});
+                //If static/final or not.
                 paramMap.put("-2", new String[]{"unknowntype"});
+                //Gets method name
                 String methodName = in.substring("METHOD".length(), index).replace(" ", "");
+                //Mark as current method
                 currentMethod = methodName;
+
+                //Add to method map
                 methods.put(methodName, paramMap);
+
+                //Create a new method
                 return indent + "public unknowntype " + paramMap.get("-1")[0] + " " + methodName + "(" + paramOut + ")";
             }
         }
+        //Begin method
         else if (previousLine.startsWith("METHOD") && in.startsWith("BEGIN")) {
             return " {\n";
         }
+        //Returns
         else if (in.startsWith("RETURN")) {
+            //Check if void or not
             if (in.length() > "RETURN".length()) {
+                //Get return items
                 String[] returnItems = in.substring("RETURN".length()).replaceAll(" ", "").split("\\u002b\\u002b|\\u002b|\u002d\u002d|\u002d|\u003d\u003d|\u003d|\\u002a|\u002f|\u0025");
+                //Find return type.
                 String type = "var";
                 for (String item : returnItems) {
                     type = findType(item);
                     if (!type.equals("var")) break;
                 }
-                out.replaceAll(methods.get(currentMethod).get("-1")[0] + " " + currentMethod, type + " " + currentMethod);
+                //Get new return type and add to map
+                out = out.replaceAll(methods.get(currentMethod).get("-1")[0] + " " + currentMethod, type + " " + currentMethod);
                 methods.get(currentMethod).get("-1")[0] = type;
+
+                //Return the new return statement.
                 return indent + "return " + in.substring("RETURN".length()) + ";";
             }
             else {
+                //Set return type as void.
                 out.replaceAll(methods.get(currentMethod).get("-1")[0] + " " + currentMethod, "void " + currentMethod);
                 methods.get(currentMethod).get("-1")[0] = "void";
+
+                //Return statement.
                 return indent + "return;";
             }
         }
         else {
+            //final return statement
             final String[] returnS = new String[]{"\n"};
+
+            //Iterates over methods
             methods.keySet().forEach(key -> {
+                //If current method is being called
                 if (in.startsWith(key)) {
+                    //Get parameters
                     String[] params;
+                    //If parameters exist, set param array
                     if (!in.contains("()")) {
                         String paramIn = in.substring(in.indexOf("(")+1, in.indexOf(")"));
 
                         if (paramIn.contains(",")) params = paramIn.split(",");
                         else params = new String[]{paramIn};
                     }
+                    //If no parameters, set blank array.
                     else params = new String[0];
+                    //Create parameters
                     for (int i = 0; i < params.length; i++) {
+                        //Get variable information
                         String[] var = methods.get(key).get(String.valueOf(i));
+                        //Old variable
                         String variable = var[0] + " " + var[1];
-                        System.out.println(params[i]);
+                        //New variable
                         String newVar = vars.get(params[i]) + " " + var[1];
-                        System.out.println(key + ": " + variable + " -> " + newVar);
+                        //Message variable change to console.
+                        System.out.println(indent + key + ": " + variable + " -> " + newVar);
+                        //Update variable
                         out = out.replaceAll(variable, newVar);
+                        //Return information
                         returnS[0] = indent + in + ";\n";
+
+                        //Replace data stored.
                         methods.get(key).replace(String.valueOf(i), new String[]{params[i], var[1]});
                     }
 
-
+                    //Set functions using the MAIN method to be static, so they can run.
                     if (currentMethod.equals("MAIN")) {
                         String newType = "static";
-                        System.out.println(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " + newType + " " + methods.get(key).get("-1")[0] + " " + key);
+                        System.out.println(indent + methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " + newType + " " + methods.get(key).get("-1")[0] + " " + key);
                         out = out.replaceAll(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key , newType + " " + methods.get(key).get("-1")[0] + " " + key);
                         methods.get(key).get("-2")[0] = newType;
                     }
+                    //Else, make it a regular function.
                     else {
                         String newType = "";
-                        System.out.println(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " +  methods.get(key).get("-1")[0] + " " + key);
+                        System.out.println(indent + methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " +  methods.get(key).get("-1")[0] + " " + key);
                         out = out.replaceAll(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key,  methods.get(key).get("-1")[0] + " " + key);
                         methods.get(key).get("-2")[0] = newType;
                     }
                 }
             });
+            //Return
             return returnS[0];
         }
 
@@ -420,6 +468,11 @@ public class ClassCompiler {
         return "\n";
     }
 
+    /**
+     * Gets the data type based on a part of setup
+     * @param item Item to check
+     * @return the data type
+     */
     private String findType(String item) {
         String output = "var";
         if (vars.containsKey(item)) {
@@ -438,66 +491,60 @@ public class ClassCompiler {
         return output;
     }
 
+    /**
+     * Sets variable data types when initiated
+     * @param split
+     */
     private void updateVariables(String[] split) {
+        //Splits variables
         split[0] = split[0].replace(" ", "");
+
+        //Checks if variable exists, and is temporary type var.
         if (vars.containsKey(split[0]) && vars.get(split[0]).equals("var")) {
             String equals = "";
             for (int i = 1; i < split.length; i++) equals += split[i] + "=";
             if (equals.substring(equals.length() - 1).contains("=")) equals = equals.substring(0, equals.length() - 1);
+            //Checks for boolean
             if (Util.isBoolean(equals.trim())) {
                 vars.remove(split[0]);
                 vars.put(split[0], "boolean");
                 System.out.println("Previous: var " + split[0] + " -> " + "boolean " + split[0]);
                 out = out.replaceAll("var " + split[0], "boolean " + split[0]);
-            } else if (Util.isDouble(equals.trim())) {
+            }
+            //If it's a double
+            else if (Util.isDouble(equals.trim())) {
                 vars.remove(split[0]);
                 vars.put(split[0], "double");
                 System.out.println("Previous: var " + split[0] + " -> " + "double " + split[0]);
                 out = out.replaceAll("var " + split[0], "double " + split[0]);
-            } else if (Util.isInteger(equals.trim())) {
+            }
+            //If it's an int
+            else if (Util.isInteger(equals.trim())) {
                 vars.remove(split[0]);
                 vars.put(split[0], "int");
                 System.out.println("Previous: var " + split[0] + " -> " + "int " + split[0]);
                 out = out.replaceAll("var " + split[0], "int " + split[0]);
-            } else if (equals.trim().startsWith("\"")) {
+            }
+            //If it's a string
+            else if (equals.trim().startsWith("\"")) {
                 vars.remove(split[0]);
                 vars.put(split[0], "String");
                 System.out.println("Previous: var " + split[0] + " -> " + "String " + split[0]);
                 out = out.replaceAll("var " + split[0], "String " + split[0]);
-            } else if (equals.trim().length() == 3 && equals.trim().startsWith("'")) {
+            }
+            //If it's a char
+            else if (equals.trim().length() == 3 && equals.trim().startsWith("'")) {
                 vars.remove(split[0]);
                 vars.put(split[0], "char");
                 System.out.println("Previous: var " + split[0] + " -> " + "char " + split[0]);
                 out = out.replaceAll("var " + split[0], "char " + split[0]);
             }
+            //Else is's complex, and you need to check all items.
             else {
                 String[] items = equals.replace(" ", "").split("\43\43|\43|\45\45|\45|\47|\42|\61\61|\37");
                 String output = "var";
                 for (String item : items) {
-                    if (vars.containsKey(item)) {
-                        output = vars.get(item);
-                        break;
-                    }
-                    else if (Util.isInteger(item)){
-                        output = "int";
-                        break;
-                    }
-                    else if (Util.isDouble(item)) {
-                        output = "double";
-                        break;
-                    }
-                    else if (Util.isBoolean(item)) {
-                        output = "boolean";
-                        break;
-                    }
-                    else if (item.length() == 3 && item.startsWith("'")) {
-                        output = "char";
-                        break;
-                    }
-                    else if (item.startsWith("\"")) {
-                        output = "String";
-                        break;
-                    }
+                    output = findType(item);
                 }
                 if (!output.equals("var")) {
                     vars.remove(split[0]);
