@@ -27,6 +27,7 @@ public class ClassCompiler {
     private Map<String,String> vars = new HashMap<>();
     private Map<String,Map<String,String[]>> methods = new HashMap<>();
     private String currentMethod = "MAIN";
+    private ArrayList<String> doubleCheck = new ArrayList<>();
 
     private String out;
 
@@ -106,6 +107,63 @@ public class ClassCompiler {
 
         Scanner in = new Scanner(System.in);
 
+        System.out.println("Double-Checking method calls");
+        //Double check method calls
+        for (int check = 0; check < doubleCheck.size(); check++) {
+
+            int finalCheck = check;
+            methods.keySet().forEach(key -> {
+                if (doubleCheck.get(finalCheck).startsWith(key)) {
+                    //Get parameters
+                    String[] params;
+                    //If parameters exist, set param array
+                    if (!doubleCheck.get(finalCheck).contains("()")) {
+                        String paramIn = doubleCheck.get(finalCheck).substring(doubleCheck.get(finalCheck).indexOf("(") + 1, doubleCheck.get(finalCheck).indexOf(")"));
+
+                        if (paramIn.contains(",")) params = paramIn.split(",");
+                        else params = new String[]{paramIn};
+                    }
+                    //If no parameters, set blank array.
+                    else params = new String[0];
+                    //Create parameters
+                    for (int i = 0; i < params.length; i++) {
+                        //Get variable information
+                        String[] var = methods.get(key).get(String.valueOf(i));
+                        //Old variable
+                        String variable = var[0] + " " + var[1];
+                        //New variable
+                        String newVar = findType(params[i]) + " " + var[1];
+                        //Message variable change to console.
+                        System.out.println("Double check method: " + key + ": " + variable + " -> " + newVar);
+                        //Update variable
+                        out = out.replaceAll(variable, newVar);
+                        //Return information
+                        //returnS[0] = indent + in + ";\n";
+
+                        //Replace data stored.
+                        methods.get(key).replace(String.valueOf(i), new String[]{params[i], var[1]});
+                    }
+
+                    //Set functions using the MAIN method to be static, so they can run.
+                    if (currentMethod.equals("MAIN")) {
+                        String newType = "static";
+                        System.out.println("Double Check method: " + methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " + newType + " " + methods.get(key).get("-1")[0] + " " + key);
+                        out = out.replaceAll(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key, newType + " " + methods.get(key).get("-1")[0] + " " + key);
+                        methods.get(key).get("-2")[0] = newType;
+                    }
+                    //Else, make it a regular function.
+                    else {
+                        String newType = "";
+                        System.out.println("Double Check Method: " + methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key + " -> " + methods.get(key).get("-1")[0] + " " + key);
+                        out = out.replaceAll(methods.get(key).get("-2")[0] + " " + methods.get(key).get("-1")[0] + " " + key, methods.get(key).get("-1")[0] + " " + key);
+                        methods.get(key).get("-2")[0] = newType;
+                    }
+                }
+            });
+        }
+        System.out.println("Removing double check message");
+        out = out.replaceAll("12doubleCheckMethodCall ", "");
+
         System.out.println("Checking for unassigned variables and method data.");
 
         vars.keySet().forEach(key -> {
@@ -116,7 +174,6 @@ public class ClassCompiler {
                 vars.replace(key, newType);
             }
         });
-
         methods.keySet().forEach(key -> {
             methods.get(key).keySet().forEach(key2 -> {
                 if (Integer.parseInt(key2) >= 0) {
@@ -431,7 +488,7 @@ public class ClassCompiler {
                         //Old variable
                         String variable = var[0] + " " + var[1];
                         //New variable
-                        String newVar = vars.get(params[i]) + " " + var[1];
+                        String newVar = findType(params[i]) + " " + var[1];
                         //Message variable change to console.
                         System.out.println(indent + key + ": " + variable + " -> " + newVar);
                         //Update variable
@@ -459,6 +516,15 @@ public class ClassCompiler {
                     }
                 }
             });
+
+            if (returnS[0].equals("\n")) {
+                if (in.replaceAll(" |\t|\n", "").equals("")) returnS[0] = "\n";
+                else {
+                    doubleCheck.add(in);
+
+                    returnS[0] = indent + "12doubleCheckMethodCall " + in + ";\n";
+                }
+            }
             //Return
             return returnS[0];
         }

@@ -31,3 +31,9 @@ Time Spent: 3 Hours
  - Added a check for unassigned variables and methods (Prompt user to input a proper value)
 
 Time Spent: 2 Hours
+
+### 1/25/22
+ - Fixed bug with passing a non-variable argument to a function
+ - Double check method calls
+
+Time Spent: 30 Minutes
