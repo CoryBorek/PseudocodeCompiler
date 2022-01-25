@@ -24,3 +24,10 @@ Time Spent: 30 Minutes
  - Bumped version number to `0.0.3-alpha`
 
 Time Spent: 3 Hours
+
+### 1/24/22
+ - Added functions
+ - Return statements to functions
+ - Added a check for unassigned variables and methods (Prompt user to input a proper value)
+
+Time Spent: 2 Hours

@@ -9,7 +9,7 @@ BEGIN
         PRINTLINE "Pseudocode Variable Test."
 
         //Variables
-        CREATE var1 = 1
+        CONSTANT var1 = 1
         CREATE var2 = 1.1
         CREATE var3
         var3 = 'c'

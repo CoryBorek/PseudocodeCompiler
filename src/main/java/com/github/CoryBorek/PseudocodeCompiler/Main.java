@@ -20,11 +20,15 @@ public class Main {
         System.out.println("Created by Cory Borek");
 
         //Get path of file from command line.
-        Path main = Paths.get("./").resolve(args[0]);
 
-        //Compile the file.
-        ClassCompiler compiler = new ClassCompiler(main.toFile());
-        compiler.run();
+        for (String arg : args) {
+            Path main = Paths.get("./").resolve(arg);
+
+            //Compile the file.
+            ClassCompiler compiler = new ClassCompiler(main.toFile());
+            compiler.run();
+
+        }
 
     }
 }
