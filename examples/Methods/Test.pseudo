@@ -2,17 +2,16 @@
 // By Cory Borek
 CLASS Test
 BEGIN
+    MAIN
+        CREATE x = 2
+        test(x)
+    END MAIN
 
     METHOD test (parameters: in)
     BEGIN
         CREATE z = in + 1
         PRINTLINE z
     END test
-
-    MAIN
-        CREATE x = 2
-        test(x)
-    END MAIN
 
 
     METHOD old (parameters: second)

@@ -35,5 +35,12 @@ Time Spent: 2 Hours
 ### 1/25/22
  - Fixed bug with passing a non-variable argument to a function
  - Double check method calls
+ - Added loops
 
-Time Spent: 30 Minutes
+Time Spent: 1 hour
+
+### 2/1/22
+ - Added If Statements
+ - Allow non-file name classes
+
+Time spent: 1 hour

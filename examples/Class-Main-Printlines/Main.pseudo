@@ -10,3 +10,9 @@ BEGIN
         PRINT "so bad!"
     END MAIN
 END CLASS
+
+CLASS Test
+BEGIN
+
+    CREATE test = 0
+END Test

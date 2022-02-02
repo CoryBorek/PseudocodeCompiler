@@ -1,0 +1,18 @@
+//Created by Cory Borek
+
+CLASS Main
+BEGIN
+    MAIN
+        CREATE test = "Test1"
+
+        IF (test == "Test1") THEN
+            PRINTLINE "Test: " + test
+        ELSE IF (test == "Test2") THEN
+            PRINTLINE "Test2"
+        ELSE
+            PRINTLINE "No Test"
+        END IF
+
+        PRINTLINE "IF OVER"
+    END MAIN
+END Main

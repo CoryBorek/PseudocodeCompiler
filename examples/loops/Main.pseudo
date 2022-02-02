@@ -1,0 +1,20 @@
+// Copied from ccse.kennesaw.edu/fye/pseudocode/pseudocodeguide.php
+// Modified by Cory Borek
+
+CLASS Main
+BEGIN
+
+    MAIN
+       CREATE start, end
+       start = 1
+       end = 15
+       FOR i = start TO end BY 2
+          IF (i == 5) THEN
+             BREAK
+          END IF
+          PRINT i + ":"
+       END FOR
+       PRINTLINE "Outside of loop"
+    END MAIN
+
+END Main

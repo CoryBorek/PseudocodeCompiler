@@ -25,9 +25,11 @@ public class ClassCompiler {
     private String previousLine = "";
     private ArrayList<String> imports = new ArrayList<>();
     private Map<String,String> vars = new HashMap<>();
+    private ArrayList<String> loopvars = new ArrayList<>();
     private Map<String,Map<String,String[]>> methods = new HashMap<>();
     private String currentMethod = "MAIN";
     private ArrayList<String> doubleCheck = new ArrayList<>();
+    boolean whileCheck = false;
 
     private String out;
 
@@ -83,7 +85,7 @@ public class ClassCompiler {
                 String temp = updateLine(comments[0], indent);
                 out += temp;
                 if(!temp.replaceAll("\t| |\n", "").equals("")) {
-                    System.out.println(indent + comments[0] + " -> " + temp.replace(indent, ""));
+                    System.out.println(indent + comments[0] + " -> " + temp.replace(indent, "").replaceAll("\n", "\t") + "\n");
                     previousLine = comments[0];
                 }
             }
@@ -170,7 +172,7 @@ public class ClassCompiler {
             if (vars.get(key).equals("var")) {
                 System.out.println("Please input a data type for " + key + ":");
                 String newType = in.nextLine();
-                out.replaceAll("var " + key, newType + " " + key);
+                out = out.replaceAll("var " + key, newType + " " + key);
                 vars.replace(key, newType);
             }
         });
@@ -230,7 +232,9 @@ public class ClassCompiler {
         //Class indentification
         if (in.startsWith("CLASS")) {
             String name = in.replace("CLASS ", "");
-            return indent + "public class " + name;
+            String type = "";
+            if (name.equals(newName.substring(0, newName.indexOf(".java")))) type = "public ";
+            return indent + type + "class " + name;
         }
         //Opening of class
         else if (previousLine.startsWith("CLASS") && in.startsWith("BEGIN")) {
@@ -238,7 +242,15 @@ public class ClassCompiler {
         }
         //End of something.
         else if (in.startsWith("END")) {
-            if (in.replace("END ", "").contains(currentMethod)) currentMethod = "MAIN";
+            if (in.replace("END", "").contains(currentMethod)) currentMethod = "MAIN";
+            else if (in.replace("END", "").contains("WHILE") && whileCheck) {
+                whileCheck = false;
+                return "";
+            }
+            else if (in.replace("END", "").contains("FOR")) {
+                vars.remove(loopvars.get(loopvars.size()-1));
+                loopvars.remove(loopvars.size()-1);
+            }
             return indent + "}\n";
         }
         //Main function
@@ -252,6 +264,61 @@ public class ClassCompiler {
         //Prints, but stays on this line.
         else if (in.startsWith("PRINT")) {
             return indent + "System.out.print(" + in.replace("PRINT ", "") + ");\n";
+        }
+        //For loops
+        else if (in.startsWith("FOR")) {
+            String[] items = in.substring("FOR".length()).split("TO|BY");
+            String name = items[0].substring(0, items[0].indexOf("=")).replace(" ", "");
+            loopvars.add(name);
+            vars.put(name, "int");
+            return indent + "for (int " + items[0] + "; "+ name + " < " + items[1] + "; " + name + " += " + items[2] + ") {\n";
+        }
+        else if (in.startsWith("WHILE")) {
+            String whileItem = in.replace("WHILE", "");
+            whileItem = whileItem.substring(whileItem.indexOf("(")+1, whileItem.length() - 1);
+
+            String[] args = whileItem.split("==|!=|<=|<|>=|>");
+            String inner = whileItem;
+            if (findType(args[0]) == "String") inner = args[0] + ".equals(" + args[1] + ")";
+            String output = indent;
+            if (whileCheck) output += "}\n" + indent;
+            output += "while (" + inner + ")";
+            if (whileCheck) output += ";\n";
+            else output += " {\n";
+            return output;
+        }
+        else if (in.startsWith("DO")) {
+            whileCheck = true;
+            return "do {";
+        }
+        else if (in.startsWith("IF")) {
+            String item = in.substring("IF".length(), in.indexOf("THEN")).trim().replaceAll(" |\\)|\\(", "");
+
+            String[] args = item.split("==|>|<|>=|<=");
+            String type = findType(args[0].replaceAll(" ", ""));
+            String out = item;
+            if (type.equals("String") || type.equals("var")) {
+                out = args[0] + ".equals(" + args[1] + ")";
+            }
+            return indent + "if (" + out + ") {\n";
+        }
+        else if (in.startsWith("ELSE")) {
+            if (in.replaceAll("ELSE| ", "").startsWith("IF")) {
+                String elseif = in.replace("ELSE", "").trim();
+                String item = elseif.substring("IF".length(), elseif.indexOf("THEN")).trim().replaceAll(" |\\)|\\(", "");
+
+                String[] args = item.split("==|>|<|>=|<=");
+                String type = findType(args[0]);
+                String out = item;
+                if (type.equals("String") || type.equals("var")); {
+                    out = args[0] + ".equals(" + args[1] + ")";
+                }
+                return indent + "}\n"+ indent + "else if (" + out + ") {\n";
+            }
+            else return indent + "}\n" + indent + "else {\n";
+        }
+        else if (in.startsWith("BREAK")) {
+            return indent + "break;\n";
         }
         //Creates a new variable
         else if (in.startsWith("CREATE")) {
@@ -313,8 +380,13 @@ public class ClassCompiler {
                 }
             }
             else {
-                vars.put(in.replace("CREATE ", ""), "var");
-                return indent + "var " + in.replace("CREATE ", "") + ";\n";
+                String[] items = in.replaceAll("CREATE| ", "").split(",");
+                String returnS = "";
+                for (String item : items){
+                    vars.put(item, "var");
+                    returnS += indent + "var " + item + ";\n";
+                }
+                return returnS;
             }
         }
         else if (in.startsWith("CONSTANT")) {
@@ -327,7 +399,6 @@ public class ClassCompiler {
                 for (int i = 1; i < split.length; i++) equals += split[i] + "=";
                 if (equals.substring(equals.length() - 1).contains("="))
                     equals = equals.substring(0, equals.length() - 1);
-
                 //If it's a boolean, output as boolean.
                 if (Util.isBoolean(equals.trim())) {
                     vars.put(split[0].replace("CONSTANT ", "").replace(" ", ""), "boolean");
@@ -376,16 +447,9 @@ public class ClassCompiler {
                     return indent + "final var " + in.replace("CONSTANT ", "") + ";\n";
                 }
             } else {
-                vars.put(in.replace("CONSTANT ", ""), "var");
+                String[] items2 = in.replace("CONSTANT ", "").split(",");
+                for (String item : items2) vars.put(item, "var");
                 return indent + "final var " + in.replace("CONSTANT ", "") + ";\n";
-            }
-        }
-        else if (in.contains("=")) {
-            //Variable Instantiation, add variable.
-            if (vars.containsKey(in.substring(0, in.indexOf("=")).replace(" ", ""))) {
-                String[] split = in.split("=");
-                updateVariables(split);
-                return indent + in + ";\n";
             }
         }
         //Methods
@@ -460,6 +524,14 @@ public class ClassCompiler {
 
                 //Return statement.
                 return indent + "return;";
+            }
+        }
+        else if (in.contains("=")) {
+            //Variable Instantiation, add variable.
+            if (vars.containsKey(in.substring(0, in.indexOf("=")).replace(" ", ""))) {
+                String[] split = in.split("=");
+                updateVariables(split);
+                return indent + in + ";\n";
             }
         }
         else {
@@ -571,6 +643,7 @@ public class ClassCompiler {
             for (int i = 1; i < split.length; i++) equals += split[i] + "=";
             if (equals.substring(equals.length() - 1).contains("=")) equals = equals.substring(0, equals.length() - 1);
             //Checks for boolean
+            equals = equals.replace(" ", "");
             if (Util.isBoolean(equals.trim())) {
                 vars.remove(split[0]);
                 vars.put(split[0], "boolean");
