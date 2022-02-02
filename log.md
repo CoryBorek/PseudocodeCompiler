@@ -42,5 +42,6 @@ Time Spent: 1 hour
 ### 2/1/22
  - Added If Statements
  - Allow non-file name classes
+ - Bump version number to 0.0.4-alpha
 
 Time spent: 1 hour
