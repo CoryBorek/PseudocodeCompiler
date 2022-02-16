@@ -45,3 +45,11 @@ Time Spent: 1 hour
  - Bump version number to 0.0.4-alpha
 
 Time spent: 1 hour
+
+### 2/16/22
+ - Started to rewrite program to use inheritance, instead of a ton of if statements and classes.
+ - Rewrote Classes, PrintLines, and Main functions
+ - Added new variable system
+ - Added new If Statements
+
+Time Spent: 9 hours

@@ -78,7 +78,7 @@ public class ClassCompiler {
             line = line.substring(firstItem).replace("//", "§§");
 
             //Split actual code from comments.
-            String[] comments = line.split("§§");
+            String[] comments = line.split("");
 
             //If the line does not start with a comment, convert the line
             if (!line.startsWith("§§")) {

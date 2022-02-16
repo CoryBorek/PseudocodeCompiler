@@ -15,4 +15,4 @@ BEGIN
 
         PRINTLINE "IF OVER"
     END MAIN
-END Main
+END CLASS

@@ -1,5 +1,9 @@
 package com.github.CoryBorek.PseudocodeCompiler;
 
+import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
+import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseClass;
+import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseFunction;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -26,6 +30,24 @@ public class Util {
         });
         //Return the output.
         return out;
+    }
+
+    public static String getIndent (String line) {
+        char[] characters = line.toCharArray();
+        int firstItem = 0;
+        for (int i = 0; i < line.length(); i++) {
+            if (characters[i] != ' ') {
+                firstItem = i;
+                break;
+            }
+        }
+        if (firstItem == 0) return "";
+        else return line.substring(0, firstItem);
+    }
+
+    public static boolean hasComment(String line) {
+        String[] commentsArr = line.split("§§");
+        return commentsArr.length > 1 || line.startsWith("//");
     }
 
     /**
@@ -56,6 +78,32 @@ public class Util {
         if (item.equals("true") || item.equals("false") || item.contains("=="))
             return true;
         else return false;
+    }
+
+    public static String findType(String val, BaseCompiler vars) {
+        String[] items = val.replace(" ", "").split("\\u002b\\u002b|\\u002b|\u002d\u002d|\u002d|\u003d\u003d|\u003d|\\u002a|\u002f|\u0025");
+        String item = items[0];
+        String output = "var";
+        if (vars instanceof BaseClass && ((BaseClass)vars).hasVar(item)) {
+            output = ((BaseClass)vars).getType(item);
+        } else if (vars instanceof BaseFunction && ((BaseFunction) vars).hasVar(item)) {
+            output = ((BaseFunction) vars).getType(item);
+        } else if (Util.isInteger(item)) {
+            output = "int";
+        } else if (Util.isDouble(item)) {
+            output = "double";
+        } else if (Util.isBoolean(item)) {
+            output = "boolean";
+        } else if (item.length() == 3 && item.startsWith("'")) {
+            output = "char";
+        } else if (item.startsWith("\"")) {
+            output = "String";
+        }
+        else if (item.startsWith("NEW ")) {
+            int i = item.indexOf("(");
+            output = item.substring("NEW ".length(), i).replaceAll(" ", "");
+        }
+        return output;
     }
 
 }

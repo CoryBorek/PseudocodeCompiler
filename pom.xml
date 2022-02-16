@@ -59,7 +59,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.github.CoryBorek.PseudocodeCompiler.Main</mainClass>
+                            <mainClass>com.github.CoryBorek.PseudocodeCompiler.NewMain</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
