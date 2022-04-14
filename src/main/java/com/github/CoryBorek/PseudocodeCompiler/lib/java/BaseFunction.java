@@ -1,6 +1,7 @@
 package com.github.CoryBorek.PseudocodeCompiler.lib.java;
 
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.CallFunction;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.Read;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements.*;
 import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.JavaPseudoFile;
@@ -125,7 +126,6 @@ public abstract class BaseFunction extends CompilationItem {
             else if (line.startsWith("WHILE")) {
                 if (getLines().size() > j+1 && subType.equals("do") && getLines().get(j+1).startsWith("END WHILE")) {
                     deep--;
-                    System.out.println(deep);
                     if (deep == 0) {
                         subFunction[1] = startingNum;
                         ArrayList<String> forLines = new ArrayList<>();
@@ -137,7 +137,6 @@ public abstract class BaseFunction extends CompilationItem {
                     }
                 }
                 else if (subType.equals("")){
-                    System.out.println(deep);
                     if (deep == 0) {
                         subFunction = new int[2];
                         subFunction[0] = startingNum;
@@ -187,24 +186,29 @@ public abstract class BaseFunction extends CompilationItem {
                     getChildren().add(new DataType(line, startingNum, getFile(), this));
                 }
                 else if (line.split(" ")[0].equals("PRINTLINE")) {
-                    System.out.println(line);
                     getChildren().add(new Printline(line, startingNum, getFile(), item));
+                }
+                else if (line.split(" ")[0].equals("BREAK")) {
+                    getChildren().add(new Break(line, startingNum, getFile(), item));
+                }
+                else if (line.split(" ")[0].equals("CONTINUE")) {
+                    getChildren().add(new Continue(line, startingNum, getFile(), item));
                 }
                 else if (line.split(" ")[0].equals("PRINT")) {
                     getChildren().add(new Print(line, startingNum, getFile(), item));
+                }
+                else if (line.split(" ")[0].equals("READ")) {
+                    getChildren().add(new Read(line, startingNum, getFile(), item));
                 }
                 else if (line.contains("(") && line.contains(")")) {
                     getChildren().add(new CallFunction(line, startingNum, getFile(), this));
                     continue;
                 }
+
             }
 
         }
 
-
-    }
-
-    protected void checks() {
 
     }
     public void updateTypes(String name, String newType) {

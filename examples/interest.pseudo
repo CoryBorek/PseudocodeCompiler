@@ -1,0 +1,20 @@
+//Program that calculates Credit card interest for one month
+//By: Ada Lovelace
+
+//This program was grabbed from the KSU FYE website! https://ccse.kennesaw.edu/fye/pseudocode/pseudocodeguide.php
+
+MAIN
+
+   CREATE creditCardDebt, interestThisMonth, apr
+
+   PRINT "Enter your credit card debt: "
+   READ creditCardDebt
+
+   PRINT "Enter the APR of the credit card: "
+   READ apr
+
+   // Calculate the interest from this month alone
+   interestThisMonth = (creditCardDebt*(apr/12))
+   PRINTLINE "You owe $" + interestThisMonth + "  this month in interest only"
+
+END MAIN

@@ -72,7 +72,9 @@ Time Spent: 1 Hour
 - Fixed a few bugs with functions
 - Fixed return types of functions with data types
 - Added a way to set argument datatypes if it's not accurately guessable
-- 
+- Made it possible to use a `READ` function
+- Fixed a bug when updating file types that thought a DataType was being declared
+- Added Breaks and Continues
 
-Time Spent: 1 3/4 Hours
+Time Spent: 3 Hours
 

@@ -1,6 +1,7 @@
 package com.github.CoryBorek.PseudocodeCompiler.impl.java;
 
 import com.github.CoryBorek.PseudocodeCompiler.Util;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.Read;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.Return;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.NormalFunction;
 import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
@@ -34,6 +35,15 @@ public class JavaPseudoFile extends PseudoFile {
         return imports;
     }
 
+
+    public void addImport(String item) {
+        boolean found = false;
+        for (int i = 0; i < imports.size(); i++) {
+            if (imports.get(i).equals(item)) found = true;
+        }
+
+        if (!found) getImports().add(item);
+    }
 
 
     @Override
@@ -107,9 +117,11 @@ public class JavaPseudoFile extends PseudoFile {
 
         ArrayList<BaseCompiler> children = this.getChildren();
         loopTypes(scan, children);
+        loopTypes(scan, children);
     }
 
     private void loopTypes(Scanner in, ArrayList<BaseCompiler> children) {
+        System.out.println(children);
         for (int i = 0; i < children.size(); i++) {
             if (children.get(i) instanceof DataType) {
                 DataType child = (DataType) children.get(i);
@@ -129,7 +141,13 @@ public class JavaPseudoFile extends PseudoFile {
                 }
 
             }
-            else if (children.get(i).getChildren().size() == 0) return;
+            else if (children.get(i) instanceof Read) {
+                Read child = (Read) children.get(i);
+                if (child.getType().equals("var")) {
+                    child.updateType();
+                }
+            }
+            else if (children.get(i).getChildren().size() == 0) continue;
             else loopTypes(in, children.get(i).getChildren());
         }
 
@@ -139,7 +157,7 @@ public class JavaPseudoFile extends PseudoFile {
     public String compile() {
         String out = "";
         for (String importS : imports) {
-            out += importS + "\n";
+            out += "import " + importS + ";\n";
         }
         for (BaseCompiler child : getChildren()) {
             out += child.compile();

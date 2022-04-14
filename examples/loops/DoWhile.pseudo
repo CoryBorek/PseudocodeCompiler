@@ -1,12 +1,17 @@
 //Do While Test
 MAIN
     CREATE i = 0
+    CREATE k
+    READ k
     DO
         PRINT "TEST" + i
         i++
         CREATE j = i
         WHILE (j < 20)
             PRINTLINE j
+            IF (k == j) THEN
+                PRINTLINE "K Equals J"
+            END IF
             j++
         END WHILE
     WHILE (i < 15)

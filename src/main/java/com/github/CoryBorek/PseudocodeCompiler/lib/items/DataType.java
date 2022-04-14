@@ -82,7 +82,7 @@ public class DataType extends SingleLineItem{
         }
         else {
             updating = true;
-            if ((getLine().contains("+") || getLine().contains("--")) && getLine().split("\\+\\+|--").length > 0) {
+            if ((getLine().contains("++") || getLine().contains("--")) && getLine().split("\\+\\+|--").length > 0) {
                 String[] split = getLine().split("\\+\\+|--");
                 name = split[0].replaceAll("CREATE| ", "").trim();
                 value = "";
@@ -113,6 +113,7 @@ public class DataType extends SingleLineItem{
                 }
             }
             else if (getLine().contains("=") && getLine().split("=").length > 1) {
+                System.out.println(" uses = ");
                 String[] split = getLine().split("=");
                 String declaration = split[0];
                 String instantiation = split[1];
@@ -142,6 +143,15 @@ public class DataType extends SingleLineItem{
 
     public void setType(String newType) {
         type = newType;
+        System.out.println("Line: " + getLine());
+        if (getLine().contains("=")) {
+            if (!(getLine().contains("CONSTANT") || getLine().contains("CREATE") || getLine().contains("PARAM"))) updating = true;
+            String declaration = getLine().substring(0, getLine().indexOf("=")).replaceAll("CONSTANT|CREATE|PARAM| ", "");
+            operation = "=";
+            String instantiation = getLine().substring(getLine().indexOf("=") + 1);
+            value = instantiation;
+            name = declaration;
+        }
         setNewLine();
 
     }
@@ -153,8 +163,8 @@ public class DataType extends SingleLineItem{
             value = instantiation;
             type = Util.findType(instantiation.replaceAll(" ", ""), getParent());
             name = declaration;
+            System.out.println("Line: " + getLine());
             if (!(getLine().startsWith("CONSTANT") || getLine().startsWith("CREATE") || getLine().startsWith("PARAM"))) updating = true;
-            operation = "=";
             if (getParent() instanceof BaseFunction) {
                 ((BaseFunction) getParent()).updateTypes(name, type);
             }
