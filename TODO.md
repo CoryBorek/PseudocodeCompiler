@@ -10,3 +10,5 @@
     - CASE/BREAKS (very difficult)
   - `RAND` - Random Numbers
     - Could be confused with regular functions
+  - Comments
+    - This is very difficult to read right now
