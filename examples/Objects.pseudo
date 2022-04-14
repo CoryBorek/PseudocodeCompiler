@@ -1,0 +1,47 @@
+CLASS Dog
+BEGIN
+
+
+    CREATE name = "Fluffy"
+    CREATE weight = 13
+    CREATE isRabid = false
+
+    CONSTRUCTOR Dog (parameters: newName, newWeight, newIsRabid)
+         name = newName
+         weight = newWeight
+         isRabid = newIsRabid
+    END CONSTRUCTOR
+
+    METHOD getName ()
+    BEGIN
+        RETURN name
+    END getName
+
+    METHOD getWeight ()
+    BEGIN
+            RETURN weight
+    END getWeight
+
+    METHOD getRabid ()
+    BEGIN
+        RETURN isRabid
+    END getRabid
+
+    METHOD bark()
+    BEGIN
+        PRINTLINE "Woof!"
+    END bark
+END CLASS
+
+
+
+MAIN
+    CREATE d1 AS Dog
+
+    d1 = NEW Dog("Fido", 6.2, false)
+
+    PRINTLINE "Name: " + d1.getName()
+    PRINTLINE "Weight: " + d1.getWeight() + "lbs"
+    PRINTLINE "Is Rabid: " + d1.getRabid()
+    d1.bark()
+END MAIN

@@ -1,0 +1,14 @@
+//Do While Test
+MAIN
+    CREATE i = 0
+    DO
+        PRINT "TEST" + i
+        i++
+        CREATE j = i
+        WHILE (j < 20)
+            PRINTLINE j
+            j++
+        END WHILE
+    WHILE (i < 15)
+    END WHILE
+END MAIN

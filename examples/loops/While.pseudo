@@ -1,0 +1,10 @@
+MAIN
+   CREATE start, end, i
+   start = 0
+   end = 15
+   i = start
+   WHILE (i <= end)
+      PRINT i + ":"
+      i++
+   END WHILE
+END MAIN

@@ -17,5 +17,7 @@ public class MainClass extends BaseClass {
     @Override
     public void setup() {
         getChildren().add(new MainFunction(getLines(), getStartingNum(), getFile(), this));
+
     }
+
 }

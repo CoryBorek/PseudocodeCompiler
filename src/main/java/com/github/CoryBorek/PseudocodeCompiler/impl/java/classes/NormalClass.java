@@ -1,10 +1,14 @@
 package com.github.CoryBorek.PseudocodeCompiler.impl.java.classes;
 
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.JavaPseudoFile;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.ConstructorFunction;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.NormalFunction;
+import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
 import com.github.CoryBorek.PseudocodeCompiler.lib.items.BlankLine;
 import com.github.CoryBorek.PseudocodeCompiler.lib.items.DataType;
 import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseClass;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.MainFunction;
+import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseFunction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +26,19 @@ public class NormalClass extends BaseClass {
         String currentFunctionName = "";
         boolean inFunction = false;
         for (String line : getLines()) {
-            System.out.println(line);
             if (line.startsWith("MAIN") && !inFunction) {
                 currentFunction[0] = getLines().indexOf(line);
                 currentFunctionName = "MAIN";
+                inFunction = true;
+            }
+            else if (line.startsWith("METHOD") && !inFunction) {
+                currentFunction[0] = getLines().indexOf(line);
+                currentFunctionName = line.substring("METHOD".length(), line.indexOf("(")).trim();
+                inFunction = true;
+            }
+            else if (line.startsWith("CONSTRUCTOR") && !inFunction) {
+                currentFunction[0] = getLines().indexOf(line);
+                currentFunctionName = "CONSTRUCTOR";
                 inFunction = true;
             }
             else if (line.startsWith("END " + currentFunctionName)) {
@@ -41,7 +54,7 @@ public class NormalClass extends BaseClass {
             }
             else if (line.contains("=") && hasVar(line.substring(0, line.indexOf("="))) && !inFunction) {
                 getChildren().add(new DataType(line, getStartingNum() + getLines().indexOf(line), getFile(), this));
-                continue;
+                //continue;
             }
 
         }
@@ -56,8 +69,11 @@ public class NormalClass extends BaseClass {
         if (name.equals("MAIN")){
             getChildren().add(new MainFunction(functionLines, items[0] + getStartingNum(), getFile(), this));
         }
+        else if (name.equals("CONSTRUCTOR")) {
+            getChildren().add(new ConstructorFunction(functionLines, items[0] + getStartingNum(), getFile(), this));
+        }
         else {
-            getChildren().add(new BlankLine(getStartingNum(), getFile(), this));
+            getChildren().add(new NormalFunction(functionLines, items[0] + getStartingNum(), getFile(), this));
         }
     }
 }

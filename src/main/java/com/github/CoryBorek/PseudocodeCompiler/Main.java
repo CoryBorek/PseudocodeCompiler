@@ -1,34 +1,24 @@
 package com.github.CoryBorek.PseudocodeCompiler;
 
-import com.github.CoryBorek.PseudocodeCompiler.impl.ClassCompiler;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.JavaPseudoFile;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-/**
- * Main class, runs program
- */
 public class Main {
 
-    /**
-     * This function runs the entire program at root.
-     * @param args program arguments from command line.
-     */
     public static void main(String[] args) {
-        //Welcome user to the program
-        System.out.println("Welcome to the Pseudocode Compiler...");
-        System.out.println("Created by Cory Borek");
-
-        //Get path of file from command line.
-
-        for (String arg : args) {
-            Path main = Paths.get("./").resolve(arg);
+        String type = args[0];
+        for (int i = 1; i < args.length; i++) {
+            Path main = Paths.get("./").resolve(args[i]);
 
             //Compile the file.
-            ClassCompiler compiler = new ClassCompiler(main.toFile());
-            compiler.run();
+            if (type.equalsIgnoreCase("java")) {
+                JavaPseudoFile file = new JavaPseudoFile(main.toFile());
+                file.run();
+            }
+
 
         }
-
     }
 }

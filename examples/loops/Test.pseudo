@@ -1,10 +1,5 @@
-CLASS Test
-BEGIN
-
-    MAIN
-       FOR i = 0 TO 12 BY 1
-          PRINTLINE i
-       END FOR
-    END MAIN
-
-END CLASS
+MAIN
+    FOR i = 0 TO 12 BY 1
+        PRINTLINE i
+    END FOR
+END MAIN

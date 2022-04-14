@@ -1,8 +1,7 @@
 package com.github.CoryBorek.PseudocodeCompiler.lib.java;
 
-import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements.ElseIfStatement;
-import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements.ElseStatement;
-import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements.IFStatement;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.CallFunction;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements.*;
 import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.JavaPseudoFile;
 import com.github.CoryBorek.PseudocodeCompiler.lib.items.BlankLine;
@@ -16,15 +15,11 @@ import java.util.*;
 
 public abstract class BaseFunction extends CompilationItem {
 
-    private int deep = 0;
     public BaseFunction(List<String> lines, int startingNum, JavaPseudoFile file, BaseCompiler parent) {
         super(lines, startingNum, file, parent);
         setup();
     }
 
-    public int getDeep() {
-        return deep;
-    }
 
     @Override
     public void setup() {
@@ -32,9 +27,9 @@ public abstract class BaseFunction extends CompilationItem {
 
         int[] subFunction = new int[2];
         String subType = "";
+        int deep = 0;
         for (int j = 1; j < getLines().size(); j++) {
             String line = getLines().get(j);
-            System.out.println(deep);
             int startingNum = getLines().indexOf(line) + getStartingNum();
             if (line.startsWith("IF")) {
 
@@ -62,6 +57,7 @@ public abstract class BaseFunction extends CompilationItem {
                     subType = "elseIf";
                 }
                 deep++;
+                continue;
             } else if (line.startsWith("ELSE")) {
                 deep--;
                 if (deep == 0) {
@@ -79,7 +75,7 @@ public abstract class BaseFunction extends CompilationItem {
                     subType = "else";
                 }
                 deep++;
-
+                continue;
             } else if (line.startsWith("END IF")) {
                 deep--;
                 if (deep == 0) {
@@ -94,34 +90,115 @@ public abstract class BaseFunction extends CompilationItem {
                         getChildren().add(new ElseIfStatement(ifLines, subFunction[0], getFile(), this));
                     else if (subType.equals("else"))
                         getChildren().add(new ElseStatement(ifLines, subFunction[0], getFile(), this));
+                    subType = "";
+                }
+                continue;
+            }
+            else if (line.startsWith("FOR")) {
+                if (deep == 0) {
+                    subFunction = new int[2];
+                    subFunction[0] = startingNum;
+                    subType = "for";
+                }
+                deep++;
+            }
+            else if (line.startsWith("END FOR")) {
+                deep--;
+                if (deep == 0) {
+                    subFunction[1] = startingNum;
+                    ArrayList<String> forLines = new ArrayList<>();
+                    for (int i = subFunction[0]; i < subFunction[1]; i++) {
+                        forLines.add(getFile().getLines().get(i));
+                    }
+                    getChildren().add(new ForLoop(forLines, subFunction[0], getFile(), this));
+                    subType = "";
                 }
             }
-            if (deep == 0) {
+            else if (line.startsWith("DO")) {
+                if (deep == 0) {
+                    subFunction = new int[2];
+                    subFunction[0] = startingNum;
+                    subType = "do";
+                }
+                deep++;
+            }
+            else if (line.startsWith("WHILE")) {
+                if (getLines().size() > j+1 && subType.equals("do") && getLines().get(j+1).startsWith("END WHILE")) {
+                    deep--;
+                    System.out.println(deep);
+                    if (deep == 0) {
+                        subFunction[1] = startingNum;
+                        ArrayList<String> forLines = new ArrayList<>();
+                        for (int i = subFunction[0]; i <= subFunction[1]; i++) {
+                            forLines.add(getFile().getLines().get(i));
+                        }
+                        getChildren().add(new DoWhileLoop(forLines, subFunction[0], getFile(), this));
+                        subType = "";
+                    }
+                }
+                else if (subType.equals("")){
+                    System.out.println(deep);
+                    if (deep == 0) {
+                        subFunction = new int[2];
+                        subFunction[0] = startingNum;
+                        subType ="while";
+                    }
+                    deep++;
+                }
+
+            }
+            else if (line.startsWith("END WHILE")) {
+                if (subType.equals("while")) {
+                    deep--;
+                    if (deep == 0) {
+                        subFunction[1] = startingNum;
+                        ArrayList<String> forLines = new ArrayList<>();
+                        for (int i = subFunction[0]; i < subFunction[1]; i++) {
+                            forLines.add(getFile().getLines().get(i));
+                        }
+                        getChildren().add(new WhileLoop(forLines, subFunction[0], getFile(), this));
+                    }
+                    subType = "";
+                }
+
+            }
+            else if (deep == 0) {
                 if (line.startsWith("§§")) {
                     getChildren().add(new CommentLine(line, startingNum, getFile(), this));
                     continue;
                 } else if (line.replaceAll(" ", "").equals("")) {
                     getChildren().add(new BlankLine(startingNum, getFile(), item));
                     continue;
-                } else if (line.contains("=") && hasVar(line.substring(0, line.indexOf("=")).replaceAll(" ", ""))) {
+                } else if (line.split("=|\\+\\+|--|\\+=|-=").length > 0 && hasVar(line.split("=|\\+\\+|--|\\+=|-=")[0].replaceAll(" ", ""))) {
                     getChildren().add(new DataType(line, startingNum, getFile(), this));
                     continue;
                 }
-                switch (line.split(" ")[0]) {
-                    case "CREATE":
+                else if (line.split(" ")[0].equals("CREATE")) {
+                    if (line.contains(",")) {
+                        String[] args = line.replaceAll("CREATE ", "").split(",");
+                        for (String arg : args) {
+                            arg = arg.trim();
+                            getChildren().add(new DataType("CREATE " + arg, startingNum, getFile(), this));
+                        }
+                    } else
                         getChildren().add(new DataType(line, startingNum, getFile(), this));
-                        break;
-                    case "CONSTANT":
-                        getChildren().add(new DataType(line, startingNum, getFile(), this));
-                        break;
-                    case "PRINTLINE":
-                        getChildren().add(new Printline(line, startingNum, getFile(), item));
-                        break;
-                    case "PRINT":
-                        getChildren().add(new Print(line, startingNum, getFile(), item));
-                        break;
+                }
+                else if (line.split(" ")[0].equals("CONSTANT")) {
+                    getChildren().add(new DataType(line, startingNum, getFile(), this));
+                }
+                else if (line.split(" ")[0].equals("PRINTLINE")) {
+                    System.out.println(line);
+                    getChildren().add(new Printline(line, startingNum, getFile(), item));
+                }
+                else if (line.split(" ")[0].equals("PRINT")) {
+                    getChildren().add(new Print(line, startingNum, getFile(), item));
+                }
+                else if (line.contains("(") && line.contains(")")) {
+                    getChildren().add(new CallFunction(line, startingNum, getFile(), this));
+                    continue;
                 }
             }
+
         }
 
 

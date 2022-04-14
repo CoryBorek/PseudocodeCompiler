@@ -46,10 +46,33 @@ Time Spent: 1 hour
 
 Time spent: 1 hour
 
-### 2/16/22
+### 2/15/22
  - Started to rewrite program to use inheritance, instead of a ton of if statements and classes.
  - Rewrote Classes, PrintLines, and Main functions
- - Added new variable system
- - Added new If Statements
+ 
+Time Spent: 5 hours
 
-Time Spent: 9 hours
+### 2/16/22
+- Added new variable system
+- Added new If Statements
+- Added new loops
+- Added new function system
+- Allowed MAIN methods to work outside a class.
+
+Time Spent: 10 Hours
+
+### 3/29/22
+- Added the ability to create Objects
+- Possibly call functions?
+- Add Constructors
+
+Time Spent: 1 Hour
+
+### 4/13/22
+- Fixed a few bugs with functions
+- Fixed return types of functions with data types
+- Added a way to set argument datatypes if it's not accurately guessable
+- 
+
+Time Spent: 1 3/4 Hours
+

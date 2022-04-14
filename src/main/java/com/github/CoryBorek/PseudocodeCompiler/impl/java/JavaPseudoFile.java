@@ -1,13 +1,17 @@
 package com.github.CoryBorek.PseudocodeCompiler.impl.java;
 
 import com.github.CoryBorek.PseudocodeCompiler.Util;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.core.Return;
+import com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.NormalFunction;
 import com.github.CoryBorek.PseudocodeCompiler.lib.BaseCompiler;
 import com.github.CoryBorek.PseudocodeCompiler.lib.PseudoFile;
 import com.github.CoryBorek.PseudocodeCompiler.lib.items.BlankLine;
 import com.github.CoryBorek.PseudocodeCompiler.lib.items.CommentLine;
+import com.github.CoryBorek.PseudocodeCompiler.lib.items.DataType;
 import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseClass;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.classes.MainClass;
 import com.github.CoryBorek.PseudocodeCompiler.impl.java.classes.NormalClass;
+import com.github.CoryBorek.PseudocodeCompiler.lib.java.BaseFunction;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -15,6 +19,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class JavaPseudoFile extends PseudoFile {
     private ArrayList<String> imports = new ArrayList<>();
@@ -42,9 +47,7 @@ public class JavaPseudoFile extends PseudoFile {
 
             String indent = Util.getIndent(fullLine);
             String line = fullLine.replaceAll(indent, "");
-            //System.out.println(line);
 
-                System.out.println(currentName + line);
                 if (line.startsWith("CLASS")) {
                     currentlyRunning = true;
                     current = new int[2];
@@ -58,7 +61,6 @@ public class JavaPseudoFile extends PseudoFile {
                     currentName = "MAIN";
                     currentType = "MAIN";
                 } else if (line.startsWith("END " + currentType)) {
-                    System.out.println(line);
                     current[1] = i;
                     addClassChild(current, currentName);
                     currentlyRunning = false;
@@ -78,7 +80,7 @@ public class JavaPseudoFile extends PseudoFile {
 
         }
 
-
+    checkTypes();
     }
 
 
@@ -98,6 +100,39 @@ public class JavaPseudoFile extends PseudoFile {
             }
             assert baseClass != null;
             getChildren().add(baseClass);
+    }
+
+    private void checkTypes() {
+        Scanner scan = new Scanner(System.in);
+
+        ArrayList<BaseCompiler> children = this.getChildren();
+        loopTypes(scan, children);
+    }
+
+    private void loopTypes(Scanner in, ArrayList<BaseCompiler> children) {
+        for (int i = 0; i < children.size(); i++) {
+            if (children.get(i) instanceof DataType) {
+                DataType child = (DataType) children.get(i);
+                if (child.getType().equals("var") && !child.getUpdating()) {
+                    System.out.println("What is the data type of variable: " + child.getName() + "?");
+                    String type = in.nextLine();
+                    if (child.getParent() instanceof BaseFunction)
+                        ((BaseFunction) child.getParent()).updateTypes(child.getName(), type);
+                    else if (child.getParent() instanceof BaseClass)
+                        ((BaseClass) child.getParent()).updateTypes(child.getName(), type);
+                }
+            } else if (children.get(i) instanceof Return) {
+                Return child = (Return) children.get(i);
+                if (child.getParent() instanceof NormalFunction) {
+                    NormalFunction p = (NormalFunction) child.getParent();
+                    p.setReturnType(Util.findType(child.getValue(), p));
+                }
+
+            }
+            else if (children.get(i).getChildren().size() == 0) return;
+            else loopTypes(in, children.get(i).getChildren());
+        }
+
     }
 
     @Override
