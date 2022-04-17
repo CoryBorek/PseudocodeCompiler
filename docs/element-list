@@ -1,0 +1,9 @@
+com.github.CoryBorek.PseudocodeCompiler
+com.github.CoryBorek.PseudocodeCompiler.impl.java
+com.github.CoryBorek.PseudocodeCompiler.impl.java.classes
+com.github.CoryBorek.PseudocodeCompiler.impl.java.core
+com.github.CoryBorek.PseudocodeCompiler.impl.java.functions
+com.github.CoryBorek.PseudocodeCompiler.impl.java.functions.statements
+com.github.CoryBorek.PseudocodeCompiler.lib
+com.github.CoryBorek.PseudocodeCompiler.lib.items
+com.github.CoryBorek.PseudocodeCompiler.lib.java

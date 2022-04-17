@@ -14,11 +14,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Base for all classes
+ */
 public abstract class BaseClass extends CompilationItem {
 
+    //Attributes
     private String className;
     boolean isPublic = false;
 
+    /**
+     * Constructor
+     * @param lines Lines in a class
+     * @param startingNum The starting index value
+     * @param file The File being converted
+     * @param className Name of the class
+     */
     public BaseClass(List<String> lines, int startingNum, JavaPseudoFile file, String className) {
         super(lines, startingNum, file, file);
         this.className = className;
@@ -27,13 +38,20 @@ public abstract class BaseClass extends CompilationItem {
         updateMethodAttributes();
     }
 
+    /**
+     * Updates method attributes
+     */
     private void updateMethodAttributes() {
+        //Stores types and if it's static
         Map<String,ArrayList<String>> varTypes = new HashMap<>();
         Map<String,Boolean> varStatic = new HashMap<>();
+        //Grabs all children
         for (BaseCompiler child : getChildren()) {
 
+            //If it's a function
             if (child instanceof BaseFunction) {
                 for (BaseCompiler grandchild : child.getChildren()) {
+                    //Store the types
                     if (grandchild instanceof CallFunction) {
                         ArrayList<String> data = ((CallFunction) grandchild).getData();
                         String name = ((CallFunction) grandchild).getName();
@@ -41,16 +59,20 @@ public abstract class BaseClass extends CompilationItem {
                         for (String datum : data) {
                             types.add(((BaseFunction) child).getType(datum));
                         }
+                        //If its a main function, make it static
                         if (child instanceof MainFunction) varStatic.put(name, true);
+                        //Normal function
                         else if (child instanceof NormalFunction) {
                             varStatic.put(name, ((NormalFunction) child).getStatic());
                         }
+                        //Stores the types
                         varTypes.put(name, types);
                     }
                 }
             }
 
         }
+        //updates data types
         for (BaseCompiler child : getChildren()) {
             if (child instanceof NormalFunction) {
                 NormalFunction f = ((NormalFunction) child);
@@ -84,19 +106,34 @@ public abstract class BaseClass extends CompilationItem {
         }
     }
 
+    /**
+     * Compiles a class
+     * @return
+     */
     @Override
     public String compile() {
+        //Gets the indentation of the first line
         String out = getFile().getIndentations().get(getStartingNum());
+        //Outputs if it's public
         if (isPublic) out += "public ";
+        //Add the class info
         out += "class " + className + " {\n";
 
+        //Compile children
         for (BaseCompiler child : getChildren()) {
             out += child.compile();
         }
+        //End the class
         out += getFile().getIndentations().get(getStartingNum() + getLines().size() - 1) + "}\n";
+        //Return the class file info
         return out;
     }
 
+    /**
+     * Updates data types
+     * @param name Name of datatype
+     * @param newType New DataType
+     */
     public void updateTypes(String name, String newType) {
         for (BaseCompiler child : getChildren()) {
             if (child instanceof DataType && ((DataType) child).getName().equals(name)) {
@@ -105,6 +142,11 @@ public abstract class BaseClass extends CompilationItem {
         }
     }
 
+    /**
+     * Checks if an object has a datatype
+     * @param name
+     * @return
+     */
     public boolean hasVar(String name) {
         for (BaseCompiler child : getChildren()) {
             if (child instanceof DataType && ((DataType) child).getName().equals(name)) {
@@ -115,6 +157,11 @@ public abstract class BaseClass extends CompilationItem {
     }
 
 
+    /**
+     * Gets the data type
+     * @param name
+     * @return
+     */
     public String getType(String name) {
         for (BaseCompiler child : getChildren()) {
             if (child instanceof DataType && ((DataType) child).getName().equals(name)) {
