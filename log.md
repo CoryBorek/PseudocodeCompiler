@@ -78,3 +78,13 @@ Time Spent: 1 Hour
 
 Time Spent: 3 Hours
 
+### 4/17/22
+
+- Added Comments
+- Created a JavaDoc
+- Bumped Version to 0.1.0
+
+Time Spent: 1 1/2 Hours
+
+## Total Time Spent on Project: 29 1/2 Hours
+

@@ -1,6 +1,4 @@
-# TODO
-## Or maybe not do
-
+# Things not completed, that will not be completed
 
 - TODO
   - WORKING WITH STRINGS
@@ -10,5 +8,3 @@
     - CASE/BREAKS (very difficult)
   - `RAND` - Random Numbers
     - Could be confused with regular functions
-  - Comments
-    - This is very difficult to read right now

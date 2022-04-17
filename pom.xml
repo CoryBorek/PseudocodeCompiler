@@ -6,7 +6,7 @@
 
     <groupId>com.github.CoryBorek</groupId>
     <artifactId>PseudocodeCompiler</artifactId>
-    <version>0.0.4-alpha</version>
+    <version>0.1.0</version>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
